@@ -37,6 +37,12 @@ public class ClientWindow extends JFrame{
     private JTextField phoneNumberNewField;
     private JButton editClientButton;
     private JLabel successEditLabel;
+    private JTextField emailDeleteField;
+    private JLabel emailDeleteLabel;
+    private JLabel successDeleteLabel;
+    private JButton deleteClientButton;
+    private JButton showAllClientsButton;
+    private JTable clientTable;
 
     ClientController clientController;
 
@@ -49,9 +55,12 @@ public class ClientWindow extends JFrame{
         setContentPane(mainPanel);
         successLabel.setVisible(false);
         successEditLabel.setVisible(false);
+        successDeleteLabel.setVisible(false);
         clientController = new ClientController(this);
         insertClientButton.addActionListener(clientController);
         editClientButton.addActionListener(clientController);
+        deleteClientButton.addActionListener(clientController);
+        showAllClientsButton.addActionListener(clientController);
     }
 
     public JButton getInsertClientButton() {
@@ -92,10 +101,6 @@ public class ClientWindow extends JFrame{
 
     public JTextField getSearchEmailField() {
         return searchEmailField;
-    }
-
-    public JPanel getMainPanel() {
-        return mainPanel;
     }
 
     public JCheckBox getEditFirstNameCheckBox() {
@@ -140,5 +145,26 @@ public class ClientWindow extends JFrame{
 
     public JLabel getSuccessEditLabel() {
         return successEditLabel;
+
+    }
+
+    public JButton getDeleteClientButton() {
+        return deleteClientButton;
+    }
+
+    public JTextField getEmailDeleteField() {
+        return emailDeleteField;
+    }
+
+    public JLabel getSuccessDeleteLabel() {
+        return successDeleteLabel;
+    }
+
+    public JButton getShowAllClientsButton() {
+        return showAllClientsButton;
+    }
+
+    public JTable getClientTable() {
+        return clientTable;
     }
 }

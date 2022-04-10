@@ -60,4 +60,12 @@ public class ClientBLL {
         }
         return ClientDAO.edit(client, searchEmail);
     }
+
+    public int deleteClient(String searchEmail) {
+        return ClientDAO.delete(searchEmail);
+    }
+
+    public String[][] showClientTable() {
+        return ClientDAO.show();
+    }
 }

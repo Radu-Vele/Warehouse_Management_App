@@ -14,6 +14,8 @@ public class ClientDAO {
             + " VALUES (?,?,?,?,?)";
     private static final String findStatementString = "SELECT * FROM client where email=?";
     private static final String editStatementString = "UPDATE Client SET firstName = ?, lastName = ?, address = ?, email = ?, phoneNumber = ? WHERE email = ? ";
+    private static final String deleteStatementString = "DELETE FROM client where email=?";
+    private static final String showStatementString = "SELECT * FROM client";
 
     public static int insert(Client client) {
         Connection dbConnection = ConnectionFactory.getConnection();
@@ -34,7 +36,7 @@ public class ClientDAO {
                 insertedID = rs.getInt(1);
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "ClientDAO:insert " + e.getMessage());
+            //LOGGER.log(Level.WARNING, "ClientDAO:insert " + e.getMessage());
             return -3;
         } finally {
             ConnectionFactory.close(insertStatement);
@@ -61,7 +63,8 @@ public class ClientDAO {
             String phoneNumber = rs.getString("phoneNumber");
             toReturn = new Client(firstName, lastName, address, email, phoneNumber);
         } catch (SQLException e) {
-            LOGGER.log(Level.WARNING,"Client DAO:findByEmail " + e.getMessage()); //TODO: trigger warning
+            //LOGGER.log(Level.WARNING,"Client DAO:findByEmail " + e.getMessage());
+            toReturn = null;
         } finally {
             ConnectionFactory.close(rs);
             ConnectionFactory.close(findStatement);
@@ -85,12 +88,83 @@ public class ClientDAO {
             editStatement.execute();
 
         } catch (SQLException e) {
-            LOGGER.log(Level.WARNING,"Client DAO:edit " + e.getMessage()); //TODO: trigger warning
+            //LOGGER.log(Level.WARNING,"Client DAO:edit " + e.getMessage());
             status = -1;
         } finally {
             ConnectionFactory.close(editStatement);
             ConnectionFactory.close(dbConnection);
         }
-        return status; //TODO: check status
+        return status;
+    }
+
+    public static int delete(String searchEmail) {
+        int status = 0;;
+        Connection dbConnection = ConnectionFactory.getConnection();
+        PreparedStatement deleteStatement = null;
+        try {
+            deleteStatement = dbConnection.prepareStatement(deleteStatementString);
+            deleteStatement.setString(1, searchEmail);
+            deleteStatement.execute();
+
+        } catch (SQLException e) {
+            //LOGGER.log(Level.WARNING,"Client DAO:edit " + e.getMessage());
+            status = -1;
+        } finally {
+            ConnectionFactory.close(deleteStatement);
+            ConnectionFactory.close(dbConnection);
+        }
+        return status;
+    }
+
+    public static String[][] show() {
+        int nrColumns = ClientDAO.numberOfEntries();
+        String[][] data = new String[nrColumns][6]; //TODO use query to get the needed number of rows;
+        Connection dbConnection = ConnectionFactory.getConnection();
+        PreparedStatement showStatement = null;
+        ResultSet rs = null;
+        try {
+            showStatement = dbConnection.prepareStatement(showStatementString);
+            rs = showStatement.executeQuery();
+
+            int i = 0;
+            while (rs.next()) {
+                data[i][0] = Integer.toString(rs.getInt("ID"));
+                data[i][1] = rs.getString("firstName");
+                data[i][2] = rs.getString("lastName");
+                data[i][3] = rs.getString("address");
+                data[i][4] = rs.getString("email");
+                data[i][5] = rs.getString("phoneNumber");
+                i++;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING,"Client DAO:show " + e.getMessage());
+            data = null;
+        } finally {
+            ConnectionFactory.close(rs);
+            ConnectionFactory.close(showStatement);
+            ConnectionFactory.close(dbConnection);
+        }
+        return data;
+    }
+
+    public static int numberOfEntries() {
+        int toReturn = 0;
+        Connection dbConnection = ConnectionFactory.getConnection();
+        PreparedStatement countStatement = null;
+        ResultSet rs = null;
+        try {
+            countStatement = dbConnection.prepareStatement("SELECT COUNT(*) FROM client");
+            rs = countStatement.executeQuery();
+            rs.next();
+            toReturn = rs.getInt("COUNT(*)");
+        } catch (SQLException e) {
+            //LOGGER.log(Level.WARNING,"Client DAO:findByEmail " + e.getMessage());
+            toReturn = -1;
+        } finally {
+            ConnectionFactory.close(rs);
+            ConnectionFactory.close(countStatement);
+            ConnectionFactory.close(dbConnection);
+        }
+        return toReturn;
     }
 }

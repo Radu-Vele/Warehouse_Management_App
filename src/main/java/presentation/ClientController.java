@@ -3,6 +3,8 @@ package presentation;
 import businessLogic.ClientBLL;
 import model.Client;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -21,6 +23,12 @@ public class ClientController implements ActionListener {
         }
         else if(source == clientWindow.getEditClientButton()) {
             this.editClientControl();
+        }
+        else if(source == clientWindow.getDeleteClientButton()) {
+            this.deleteClientControl();
+        }
+        else if(source == clientWindow.getShowAllClientsButton()) {
+            this.showClientTableControl();
         }
     }
 
@@ -56,6 +64,10 @@ public class ClientController implements ActionListener {
         String searchEmail = clientWindow.getSearchEmailField().getText();
         ClientBLL clientBLL = new ClientBLL();
         Client toEdit = clientBLL.findClientByEmail(searchEmail);
+        if(toEdit == null) {
+            ErrorPrompt prompt = new ErrorPrompt("There is no client having the inserted email address!");
+            return;
+        }
         int countChangedFields = 0;
 
         if(clientWindow.getEditFirstNameCheckBox().isSelected()) {
@@ -80,13 +92,50 @@ public class ClientController implements ActionListener {
         }
 
         if(countChangedFields == 0) {
-            ErrorPrompt prompt = new ErrorPrompt("You actually inserted the same fields");
+            ErrorPrompt prompt = new ErrorPrompt("You must check at least one field to update!");
             return;
         }
 
         int status = clientBLL.editClient(toEdit, searchEmail);
-        if(status != -1) {
+        if(status == -2) {
+            ErrorPrompt prompt = new ErrorPrompt("The newly inserted email address is not valid!");
+        }
+        else if (status == -1) {
+            ErrorPrompt prompt = new ErrorPrompt("The edit operation was unsuccessful");
+        }
+        else {
             clientWindow.getSuccessEditLabel().setVisible(true);
         }
     }
+
+    public void deleteClientControl() {
+        clientWindow.getSuccessDeleteLabel().setVisible(false);
+        String emailDelete = clientWindow.getEmailDeleteField().getText();
+        if(emailDelete.equals("")) {
+            ErrorPrompt prompt = new ErrorPrompt("The email address must be inserted in the text field!");
+            return;
+        }
+        ClientBLL clientBLL = new ClientBLL();
+        int status = clientBLL.deleteClient(emailDelete);
+        if(status == -1) {
+            //TODO: should I find client first?
+            ErrorPrompt prompt = new ErrorPrompt("There is no client having the inserted email address");
+        }
+        else {
+            clientWindow.getSuccessDeleteLabel().setVisible(true);
+        }
+    }
+
+    public void showClientTableControl() {
+        ClientBLL clientBLL = new ClientBLL();
+        String[][] data= clientBLL.showClientTable();
+        if(data == null) {
+            ErrorPrompt prompt = new ErrorPrompt("Unable to retrieve data from the table!");
+        }
+        String[] columnHeadings = new String[] {"ID", "First Name", "Last Name", "Address", "Email", "Phone Number"};
+        DefaultTableModel tableModel = new DefaultTableModel(data, columnHeadings);
+        JTable table = clientWindow.getClientTable();
+        table.setModel(tableModel);
+    }
 }
+
