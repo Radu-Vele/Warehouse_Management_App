@@ -1,8 +1,6 @@
 package presentation;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class HomeWindow extends JFrame{
     private JPanel mainPanel;
@@ -11,17 +9,31 @@ public class HomeWindow extends JFrame{
     private JButton orderOperationsButton;
     private JLabel selectLabel;
 
-    private Controller controller;
+    private HomeController controller;
 
     public HomeWindow() {
         setTitle("Warehouse Management Application");
-        setSize(800, 300);
+        setSize(500, 200);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setContentPane(mainPanel);
 
-        controller = new Controller(this);
+        controller = new HomeController(this);
         clientOperationsButton.addActionListener(controller);
+        productOperationsButton.addActionListener(controller);
+        orderOperationsButton.addActionListener(controller);
+    }
+
+    public JButton getClientOperationsButton() {
+        return clientOperationsButton;
+    }
+
+    public JButton getOrderOperationsButton() {
+        return orderOperationsButton;
+    }
+
+    public JButton getProductOperationsButton() {
+        return productOperationsButton;
     }
 }

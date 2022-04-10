@@ -6,13 +6,14 @@ import java.util.regex.Pattern;
 
 public class EmailValidator implements Validator<Client>{
     //Email pattern
-    private static final String email_pattern = "[\\w]+[@][\\w]+[\\.][\\w]{2,4}";
+    private static final String email_pattern = "[\\w]+[@][\\w]+[.][\\w]{2,4}"; //TODO: more complex
 
     @Override
-    public void validate(Client t) {
+    public String  validate(Client t) {
         Pattern pattern = Pattern.compile(email_pattern);
         if(!pattern.matcher(t.getEmail()).matches()){
-            throw new IllegalArgumentException("The email is not valid"); //TODO: pop up window
+            return "Error: the inserted e-mail address is not valid";
         }
+        return "";
     }
 }

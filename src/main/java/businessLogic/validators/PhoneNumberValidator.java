@@ -9,10 +9,11 @@ public class PhoneNumberValidator implements Validator<Client>{
     private static final String phone_pattern = "[0][\\d]{9}";
 
     @Override
-    public void validate(Client t) {
+    public String validate(Client t) {
         Pattern pattern = Pattern.compile(phone_pattern);
         if(!pattern.matcher(t.getPhoneNumber()).matches()){
-            throw new IllegalArgumentException("The phone number is not valid"); //TODO: pop up window
+            return "Error: The inserted phone number is not valid";
         }
+        return "";
     }
 }

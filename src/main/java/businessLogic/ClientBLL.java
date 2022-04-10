@@ -27,11 +27,37 @@ public class ClientBLL {
      * @return
      */
     public int insertClient(Client client) {
-
         for(Validator v : validators) {
-            v.validate(client);
+            String returnMessage = v.validate(client);
+            if( returnMessage != "") {
+                return -2;
+            }
         }
 
         return ClientDAO.insert(client);
+    }
+
+    /**
+     * @param searchEmail
+     * @return Client object, or null if client not found
+     */
+    public Client findClientByEmail(String searchEmail) {
+        return ClientDAO.findByEmail(searchEmail);
+    }
+
+    /**
+     * Sends a request to DAO to search for
+     * @param client
+     * @return
+     */
+    public int editClient(Client client, String searchEmail) {
+        //validate changed fields
+        for(Validator v : validators) {
+            String returnMessage = v.validate(client);
+            if(returnMessage != "") {
+                return -2;
+            }
+        }
+        return ClientDAO.edit(client, searchEmail);
     }
 }
