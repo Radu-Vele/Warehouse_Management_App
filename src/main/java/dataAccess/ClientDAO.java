@@ -19,7 +19,6 @@ public class ClientDAO {
 
     public static int insert(Client client) {
         Connection dbConnection = ConnectionFactory.getConnection();
-
         int insertedID = -1; //return value
         PreparedStatement insertStatement = null;
         try {
