@@ -34,6 +34,7 @@ public class ProductWindow extends JFrame{
     private JLabel successDeleteLabel;
     private JButton viewAllProductsButton;
     private JTable productTable;
+    private ImageIcon imageIcon;
 
     ProductController productController;
 
@@ -44,6 +45,9 @@ public class ProductWindow extends JFrame{
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setLocationRelativeTo(null);
         setContentPane(mainPanel);
+        imageIcon = new ImageIcon("src/main/images/cubes.png");
+        setIconImage(imageIcon.getImage());
+
         productController = new ProductController(this);
         successAddLabel.setVisible(false);
         successEditLabel.setVisible(false);

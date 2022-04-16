@@ -16,6 +16,7 @@ public class OrderWindow extends JFrame{
     private JLabel selectClientLabel;
     private JLabel selectProductLabel;
     private OrderController controller;
+    private ImageIcon imageIcon;
 
     public OrderWindow() {
         setTitle("Orders Management Form");
@@ -24,6 +25,8 @@ public class OrderWindow extends JFrame{
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setLocationRelativeTo(null);
         setContentPane(mainPanel);
+        imageIcon = new ImageIcon("src/main/images/checklist.png");
+        setIconImage(imageIcon.getImage());
         this.controller = new OrderController(this);
         this.successOrderLabel.setVisible(false);
         orderButton.addActionListener(controller);

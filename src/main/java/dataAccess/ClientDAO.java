@@ -114,7 +114,7 @@ public class ClientDAO {
 
     public static String[][] show() {
         int nrColumns = ClientDAO.numberOfEntries();
-        String[][] data = new String[nrColumns][6]; //TODO use query to get the needed number of rows;
+        String[][] data = new String[nrColumns][6];
         Connection dbConnection = ConnectionFactory.getConnection();
         PreparedStatement showStatement = null;
         ResultSet rs = null;

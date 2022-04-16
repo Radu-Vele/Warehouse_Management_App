@@ -43,6 +43,7 @@ public class ClientWindow extends JFrame{
     private JButton deleteClientButton;
     private JButton showAllClientsButton;
     private JTable clientTable;
+    ImageIcon imageIcon;
 
     ClientController clientController;
 
@@ -56,6 +57,10 @@ public class ClientWindow extends JFrame{
         successLabel.setVisible(false);
         successEditLabel.setVisible(false);
         successDeleteLabel.setVisible(false);
+        imageIcon = new ImageIcon("src/main/images/customer.png");
+        setIconImage(imageIcon.getImage());
+
+
         clientController = new ClientController(this);
         insertClientButton.addActionListener(clientController);
         editClientButton.addActionListener(clientController);
@@ -167,4 +172,5 @@ public class ClientWindow extends JFrame{
     public JTable getClientTable() {
         return clientTable;
     }
+
 }

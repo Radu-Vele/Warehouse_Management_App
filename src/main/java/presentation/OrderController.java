@@ -91,7 +91,9 @@ public class OrderController implements ActionListener {
 
             newOrder.setID(orderID);
 
-            //TODO: generate bill
+            if(orderWindow.getIWantABillCheckBox().isSelected()) {
+                generatePDF();
+            }
 
             orderWindow.getSuccessOrderLabel().setVisible(true);
         } catch (NumberFormatException e) {
@@ -125,6 +127,10 @@ public class OrderController implements ActionListener {
         }
 
         return results;
+    }
+
+    public void generatePDF() {
+        //TODO: generate bill
     }
 
 }
