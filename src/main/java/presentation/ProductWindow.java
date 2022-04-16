@@ -28,6 +28,12 @@ public class ProductWindow extends JFrame{
     private JCheckBox editNumberOfItemsCheckBox;
     private JButton editProductButton;
     private JLabel successEditLabel;
+    private JTextField deleteIDField;
+    private JButton deleteProductButton;
+    private JLabel deleteIDLabel;
+    private JLabel successDeleteLabel;
+    private JButton viewAllProductsButton;
+    private JTable productTable;
 
     ProductController productController;
 
@@ -41,9 +47,12 @@ public class ProductWindow extends JFrame{
         productController = new ProductController(this);
         successAddLabel.setVisible(false);
         successEditLabel.setVisible(false);
+        successDeleteLabel.setVisible(false);
 
         insertProductButton.addActionListener(productController);
         editProductButton.addActionListener(productController);
+        deleteProductButton.addActionListener(productController);
+        viewAllProductsButton.addActionListener(productController);
     }
 
     public JButton getInsertProductButton() {
@@ -104,5 +113,25 @@ public class ProductWindow extends JFrame{
 
     public JButton getEditProductButton() {
         return editProductButton;
+    }
+
+    public JButton getDeleteProductButton() {
+        return deleteProductButton;
+    }
+
+    public JLabel getSuccessDeleteLabel() {
+        return successDeleteLabel;
+    }
+
+    public JTextField getDeleteIDField() {
+        return deleteIDField;
+    }
+
+    public JButton getViewAllProductsButton() {
+        return viewAllProductsButton;
+    }
+
+    public JTable getProductTable() {
+        return productTable;
     }
 }

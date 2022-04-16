@@ -24,4 +24,16 @@ public class ProductBLL {
     public Product findProductByID(int ID) {
         return ProductDAO.findByID(ID);
     }
+
+    public int deleteProduct(int ID) {
+        return ProductDAO.delete(ID);
+    }
+
+    public String[][] showProductTable() {
+        return ProductDAO.show();
+    }
+
+    public String[] getProductTitlesAndIDs() {
+        return ProductDAO.getTitlesAndIDs();
+    }
 }

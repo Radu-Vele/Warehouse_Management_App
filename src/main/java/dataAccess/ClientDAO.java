@@ -62,7 +62,6 @@ public class ClientDAO {
             String phoneNumber = rs.getString("phoneNumber");
             toReturn = new Client(firstName, lastName, address, email, phoneNumber);
         } catch (SQLException e) {
-            //LOGGER.log(Level.WARNING,"Client DAO:findByEmail " + e.getMessage());
             toReturn = null;
         } finally {
             ConnectionFactory.close(rs);
@@ -87,7 +86,6 @@ public class ClientDAO {
             editStatement.execute();
 
         } catch (SQLException e) {
-            //LOGGER.log(Level.WARNING,"Client DAO:edit " + e.getMessage());
             status = -1;
         } finally {
             ConnectionFactory.close(editStatement);
@@ -106,7 +104,6 @@ public class ClientDAO {
             deleteStatement.execute();
 
         } catch (SQLException e) {
-            //LOGGER.log(Level.WARNING,"Client DAO:edit " + e.getMessage());
             status = -1;
         } finally {
             ConnectionFactory.close(deleteStatement);
@@ -157,13 +154,38 @@ public class ClientDAO {
             rs.next();
             toReturn = rs.getInt("COUNT(*)");
         } catch (SQLException e) {
-            //LOGGER.log(Level.WARNING,"Client DAO:findByEmail " + e.getMessage());
             toReturn = -1;
         } finally {
             ConnectionFactory.close(rs);
             ConnectionFactory.close(countStatement);
             ConnectionFactory.close(dbConnection);
         }
+        return toReturn;
+    }
+
+    public static String[] getEmails() {
+        String[] toReturn = new String[numberOfEntries()];
+        Connection dbConnection = ConnectionFactory.getConnection();
+        PreparedStatement columnStatement = null;
+        ResultSet rs = null;
+        try {
+            columnStatement = dbConnection.prepareStatement("SELECT email FROM client");
+            rs = columnStatement.executeQuery();
+
+            int i = 0;
+            while (rs.next()) {
+                toReturn[i] = rs.getString("email");
+                i++;
+            }
+
+        } catch (SQLException e) {
+            toReturn = null;
+        } finally {
+            ConnectionFactory.close(rs);
+            ConnectionFactory.close(columnStatement);
+            ConnectionFactory.close(dbConnection);
+        }
+
         return toReturn;
     }
 }

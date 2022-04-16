@@ -68,4 +68,9 @@ public class ClientBLL {
     public String[][] showClientTable() {
         return ClientDAO.show();
     }
+
+    public String[] getClientEmails() {
+        return ClientDAO.getEmails();
+    }
 }
+

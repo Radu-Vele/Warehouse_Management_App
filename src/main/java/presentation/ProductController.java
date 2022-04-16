@@ -4,6 +4,8 @@ package presentation;
 import businessLogic.ProductBLL;
 import model.Product;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -20,8 +22,12 @@ public class ProductController implements ActionListener {
 
         if(source == productWindow.getInsertProductButton()) {
             insertProductControl();
-        } else if(source == productWindow.getEditProductButton()){
+        } else if(source == productWindow.getEditProductButton()) {
             editProductControl();
+        } else if(source == productWindow.getDeleteProductButton()) {
+            deleteProductControl();
+        } else if(source == productWindow.getViewAllProductsButton()) {
+            viewAllProductControl();
         }
     }
 
@@ -93,4 +99,33 @@ public class ProductController implements ActionListener {
         }
     }
 
+    public void deleteProductControl() {
+        productWindow.getSuccessDeleteLabel().setVisible(false);
+        ProductBLL productBLL = new ProductBLL();
+        try {
+            int ID = Integer.parseInt(productWindow.getDeleteIDField().getText());
+            int status = productBLL.deleteProduct(ID);
+
+            if(status == -1) {
+                ErrorPrompt errorPrompt = new ErrorPrompt("Product with such ID not found");
+            } else {
+                productWindow.getSuccessDeleteLabel().setVisible(true);
+            }
+        } catch (Exception e) {
+            ErrorPrompt errorPrompt = new ErrorPrompt("You must input a valid (integer) ID!");
+        }
+    }
+
+    public void viewAllProductControl() {
+        ProductBLL productBLL = new ProductBLL();
+        String[][] data = productBLL.showProductTable();
+
+        if(data == null) {
+            ErrorPrompt prompt = new ErrorPrompt("Unable to retrieve data from the table!");
+        }
+        String[] columnHeadings = new String[] {"Product ID", "Title", "Manufacturer", "Items in Stock"};
+        DefaultTableModel tableModel = new DefaultTableModel(data, columnHeadings);
+        JTable table = productWindow.getProductTable();
+        table.setModel(tableModel);
+    }
 }

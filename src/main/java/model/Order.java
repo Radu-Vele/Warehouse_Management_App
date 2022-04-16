@@ -1,15 +1,43 @@
 package model;
 
 public class Order {
-    private Client client;
-    private Product product;
+    private String clientEmail;
+    private int productID;
     private int ID;
-    private int processingDate;
+    private int numberOfItems;
+    private String processingDate;
 
-    public Order(Client client, Product product, int ID, int processingDate) {
-        this.client = client;
-        this.product = product;
+    public Order(String clientEmail, int productID, int numberOfItems) {
+        this.clientEmail = clientEmail;
+        this.productID = productID;
+        this.numberOfItems = numberOfItems;
+    }
+
+    public String getClientEmail() {
+        return clientEmail;
+    }
+
+    public int getProductID() {
+        return productID;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public int getNumberOfItems() {
+        return numberOfItems;
+    }
+
+    public String getProcessingDate() {
+        return processingDate;
+    }
+
+    public void setID(int ID) {
         this.ID = ID;
+    }
+
+    public void setProcessingDate(String processingDate) {
         this.processingDate = processingDate;
     }
 }
