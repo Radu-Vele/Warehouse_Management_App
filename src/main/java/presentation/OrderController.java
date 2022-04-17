@@ -13,7 +13,11 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.sql.Timestamp;
-
+import org.apache.pdfbox.*;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 public class OrderController implements ActionListener {
     private  OrderWindow orderWindow;
@@ -93,7 +97,7 @@ public class OrderController implements ActionListener {
             newOrder.setID(orderID);
 
             if(orderWindow.getIWantABillCheckBox().isSelected()) {
-                generatePDF();
+                generatePDF(newOrder, foundProduct, foundClient);
             }
 
             orderWindow.getSuccessOrderLabel().setVisible(true);
@@ -130,8 +134,65 @@ public class OrderController implements ActionListener {
         return results;
     }
 
-    public void generatePDF() {
-        //TODO: generate bill
+    public void generatePDF(Order order, Product product, Client client) {
+        //TODO: more elegant, more details
+        try {
+            PDDocument document = new PDDocument();
+            PDPage page = new PDPage();
+            document.addPage(page);
+            PDPageContentStream contentStream = new PDPageContentStream(document, page);
+
+            contentStream.beginText();
+
+            contentStream.setFont(PDType1Font.TIMES_ROMAN, 12);
+
+            contentStream.setLeading(14.5f);
+            contentStream.newLineAtOffset(25, 700);
+
+            String line1 = "The details of your order:";
+            contentStream.showText(line1);
+            contentStream.newLine();
+
+            String dashed_line = "------------------------------------";
+            contentStream.showText(dashed_line);
+            contentStream.newLine();
+            contentStream.newLine();
+
+            String line2 = "Order ID: " + Integer.toString(order.getID());
+            contentStream.showText(line2);
+            contentStream.newLine();
+
+            String line3 = "Customer: " + client.getFirstName() + " " + client.getLastName();
+            contentStream.showText(line3);
+            contentStream.newLine();
+
+            String line3_1 = "Customer Email Address: " + client.getEmail();
+            contentStream.showText(line3_1);
+            contentStream.newLine();
+
+            contentStream.newLine();
+            contentStream.showText(dashed_line);
+            contentStream.newLine();
+
+            String line4 = "Product: \"" + product.getTitle() + "\" produced by: " + product.getManufacturer();
+            contentStream.showText(line4);
+            contentStream.newLine();
+
+            String line5 = "Number of items purchased: " + Integer.toString(order.getNumberOfItems());
+            contentStream.showText(line5);
+            contentStream.newLine();
+
+            contentStream.endText();
+            contentStream.close();
+
+            document.save("Receipt_" + order.getID() + "_" + order.getProcessingDate().substring(0, 10) + ".pdf");
+            document.close();
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+
     }
 
 }
