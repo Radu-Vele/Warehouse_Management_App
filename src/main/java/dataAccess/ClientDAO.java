@@ -12,12 +12,11 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ClientDAO {
+public class ClientDAO extends GenericDAO<Client>{
 
     protected static final Logger LOGGER = Logger.getLogger(ClientDAO.class.getName());
     private static final String insertStatementString = "INSERT INTO client (firstName,lastName,address,email,phoneNumber)"
             + " VALUES (?,?,?,?,?)";
-    private static final String findStatementString = "SELECT * FROM client where email=?";
     private static final String editStatementString = "UPDATE Client SET firstName = ?, lastName = ?, address = ?, email = ?, phoneNumber = ? WHERE email = ? ";
     private static final String deleteStatementString = "DELETE FROM client where email=?";
     private static final String showStatementString = "SELECT * FROM client";
@@ -50,32 +49,10 @@ public class ClientDAO {
         return insertedID;
     }
 
-    public static Client findByEmail(String searchEmail) {
-        Client toReturn = null;
-        Connection dbConnection = ConnectionFactory.getConnection();
-        PreparedStatement findStatement = null;
-        ResultSet rs = null;
-        try {
-            findStatement = dbConnection.prepareStatement(findStatementString);
-            findStatement.setString(1, searchEmail);
-            rs = findStatement.executeQuery();
-            rs.next();
-
-            String firstName = rs.getString("firstName");
-            String lastName = rs.getString("lastName");
-            String address = rs.getString("address");
-            String email = rs.getString("email");
-            String phoneNumber = rs.getString("phoneNumber");
-            toReturn = new Client(firstName, lastName, address, email, phoneNumber);
-        } catch (SQLException e) {
-            toReturn = null;
-        } finally {
-            ConnectionFactory.close(rs);
-            ConnectionFactory.close(findStatement);
-            ConnectionFactory.close(dbConnection);
-        }
-        return toReturn;
+    public Client findByEmail(String searchEmail) {
+        return  super.find(searchEmail);
     }
+
 
     public static int edit(Client client, String searchEmail) {
         int status = 0;;

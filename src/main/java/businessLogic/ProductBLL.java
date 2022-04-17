@@ -4,7 +4,9 @@ import dataAccess.ProductDAO;
 import model.Product;
 
 public class ProductBLL {
+    private ProductDAO productDAO;
     public ProductBLL() {
+        productDAO = new ProductDAO();
     }
 
     public int insertProduct(Product product) {
@@ -22,7 +24,7 @@ public class ProductBLL {
     }
 
     public Product findProductByID(int ID) {
-        return ProductDAO.findByID(ID);
+        return productDAO.findByID(ID);
     }
 
     public int deleteProduct(int ID) {

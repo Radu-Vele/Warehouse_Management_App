@@ -9,11 +9,11 @@ import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ProductDAO {
+public class ProductDAO extends GenericDAO<Product>{
     protected static final Logger LOGGER = Logger.getLogger(ProductDAO.class.getName());
     private static final String insertStatementString = "INSERT INTO product (title, manufacturer, itemsInStock)"
             + "VALUES (?, ?, ?)";
-    private static final String findStatementString = "SELECT * FROM product WHERE ID =?";
+
     private static final String editStatementString = "UPDATE product SET title = ?, manufacturer = ?, itemsInStock = ? WHERE ID = ? ";
     private static final String deleteStatementString = "DELETE FROM product WHERE ID=?";
     private static final String showStatementString = "SELECT * FROM product";
@@ -43,30 +43,8 @@ public class ProductDAO {
         return returnID;
     }
 
-    public static Product findByID(int ID) {
-        Connection dbConnection = ConnectionFactory.getConnection();
-        Product toReturn = null;
-        PreparedStatement findStatement = null;
-        ResultSet resultSet = null;
-        try {
-            findStatement = dbConnection.prepareStatement(findStatementString);
-            findStatement.setInt(1, ID);
-            resultSet = findStatement.executeQuery();
-            resultSet.next();
-
-            String title = resultSet.getString("title");
-            String manufacturer = resultSet.getString("manufacturer");
-            int itemsInStock = resultSet.getInt("itemsInStock");
-            toReturn = new Product(title, manufacturer, itemsInStock);
-            toReturn.setID(ID);
-        } catch (SQLException e) {
-            toReturn = null;
-        } finally {
-            ConnectionFactory.close(resultSet);
-            ConnectionFactory.close(findStatement);
-            ConnectionFactory.close(dbConnection);
-        }
-        return toReturn;
+    public Product findByID(int ID) {
+        return super.find(ID);
     }
 
     public static int edit(int ID, Product product) {

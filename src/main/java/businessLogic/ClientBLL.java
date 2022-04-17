@@ -11,6 +11,7 @@ import java.util.ArrayList;
 public class ClientBLL {
     //validators
     ArrayList<Validator<Client>> validators;
+    ClientDAO clientDAO;
 
     /**
      * Initializes the validators for the client
@@ -19,6 +20,8 @@ public class ClientBLL {
         validators = new ArrayList<Validator<Client>>();
         validators.add(new EmailValidator());
         validators.add(new PhoneNumberValidator());
+
+        clientDAO = new ClientDAO();
     }
 
     /**
@@ -42,7 +45,7 @@ public class ClientBLL {
      * @return Client object, or null if client not found
      */
     public Client findClientByEmail(String searchEmail) {
-        return ClientDAO.findByEmail(searchEmail);
+        return clientDAO.findByEmail(searchEmail);
     }
 
     /**
