@@ -72,5 +72,9 @@ public class ClientBLL {
     public String[] getClientEmails() {
         return ClientDAO.getEmails();
     }
+
+    public String tableFromList(ArrayList<Object> objects) {
+        return ClientDAO.tableFromList(objects);
+    }
 }
 

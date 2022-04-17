@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class ClientController implements ActionListener {
     ClientWindow clientWindow;
@@ -18,17 +19,16 @@ public class ClientController implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if(source == clientWindow.getInsertClientButton()) {
+        if (source == clientWindow.getInsertClientButton()) {
             this.insertClientControl();
-        }
-        else if(source == clientWindow.getEditClientButton()) {
+        } else if (source == clientWindow.getEditClientButton()) {
             this.editClientControl();
-        }
-        else if(source == clientWindow.getDeleteClientButton()) {
+        } else if (source == clientWindow.getDeleteClientButton()) {
             this.deleteClientControl();
-        }
-        else if(source == clientWindow.getShowAllClientsButton()) {
+        } else if (source == clientWindow.getShowAllClientsButton()) {
             this.showClientTableControl();
+        } else if (source == clientWindow.getDuplicateTableButton()) {
+            this.duplicateClientControl();
         }
     }
 
@@ -39,7 +39,7 @@ public class ClientController implements ActionListener {
         String address = clientWindow.getAddressField().getText();
         String email = clientWindow.getEmailField().getText();
         String phoneNumber = clientWindow.getPhoneNumberField().getText();
-        if(firstName.equals("") || lastName.equals("") || address.equals("") || email.equals("") || phoneNumber.equals("")) {
+        if (firstName.equals("") || lastName.equals("") || address.equals("") || email.equals("") || phoneNumber.equals("")) {
             ErrorPrompt prompt = new ErrorPrompt("You must complete all the fields!");
             return;
         }
@@ -48,13 +48,11 @@ public class ClientController implements ActionListener {
         int givenID = clientBLL.insertClient(newClient);
         newClient.setID(givenID);
 
-        if(givenID == -2) { //not valid
+        if (givenID == -2) { //not valid
             ErrorPrompt prompt = new ErrorPrompt("The email and/or phone number format is not valid!");
-        }
-        else if(givenID == -3) { //already existing email
+        } else if (givenID == -3) { //already existing email
             ErrorPrompt prompt = new ErrorPrompt("A client with the inserted email address already exists.");
-        }
-        else if(givenID != -1) {
+        } else if (givenID != -1) {
             clientWindow.getSuccessLabel().setVisible(true);
         }
     }
@@ -64,46 +62,44 @@ public class ClientController implements ActionListener {
         String searchEmail = clientWindow.getSearchEmailField().getText();
         ClientBLL clientBLL = new ClientBLL();
         Client toEdit = clientBLL.findClientByEmail(searchEmail);
-        if(toEdit == null) {
+        if (toEdit == null) {
             ErrorPrompt prompt = new ErrorPrompt("There is no client having the inserted email address!");
             return;
         }
         int countChangedFields = 0;
 
-        if(clientWindow.getEditFirstNameCheckBox().isSelected()) {
+        if (clientWindow.getEditFirstNameCheckBox().isSelected()) {
             toEdit.setFirstName(clientWindow.getFirstNameNewField().getText());
             countChangedFields++;
         }
-        if(clientWindow.getEditLastNameCheckBox().isSelected()) {
+        if (clientWindow.getEditLastNameCheckBox().isSelected()) {
             toEdit.setLastName(clientWindow.getLastNameNewField().getText());
             countChangedFields++;
         }
-        if(clientWindow.getEditAddressCheckBox().isSelected()) {
+        if (clientWindow.getEditAddressCheckBox().isSelected()) {
             toEdit.setAddress(clientWindow.getAddressNewField().getText());
             countChangedFields++;
         }
-        if(clientWindow.getEditEmailAddressCheckBox().isSelected()){
+        if (clientWindow.getEditEmailAddressCheckBox().isSelected()) {
             toEdit.setEmail(clientWindow.getEmailNewField().getText());
             countChangedFields++;
         }
-        if(clientWindow.getEditPhoneNumberCheckBox().isSelected()) {
+        if (clientWindow.getEditPhoneNumberCheckBox().isSelected()) {
             toEdit.setPhoneNumber(clientWindow.getPhoneNumberNewField().getText());
             countChangedFields++;
         }
 
-        if(countChangedFields == 0) {
+        if (countChangedFields == 0) {
             ErrorPrompt prompt = new ErrorPrompt("You must check at least one field to update!");
             return;
         }
 
         int status = clientBLL.editClient(toEdit, searchEmail);
-        if(status == -2) {
+        if (status == -2) {
             ErrorPrompt prompt = new ErrorPrompt("The newly inserted email address is not valid!");
-        }
-        else if (status == -1) {
+        } else if (status == -1) {
             ErrorPrompt prompt = new ErrorPrompt("The edit operation was unsuccessful");
-        }
-        else {
+        } else {
             clientWindow.getSuccessEditLabel().setVisible(true);
         }
     }
@@ -111,31 +107,57 @@ public class ClientController implements ActionListener {
     public void deleteClientControl() {
         clientWindow.getSuccessDeleteLabel().setVisible(false);
         String emailDelete = clientWindow.getEmailDeleteField().getText();
-        if(emailDelete.equals("")) {
+        if (emailDelete.equals("")) {
             ErrorPrompt prompt = new ErrorPrompt("The email address must be inserted in the text field!");
             return;
         }
         ClientBLL clientBLL = new ClientBLL();
         int status = clientBLL.deleteClient(emailDelete);
-        if(status == -1) {
+        if (status == -1) {
             //TODO: should I find client first?
             ErrorPrompt prompt = new ErrorPrompt("There is no client having the inserted email address");
-        }
-        else {
+        } else {
             clientWindow.getSuccessDeleteLabel().setVisible(true);
         }
     }
 
     public void showClientTableControl() {
         ClientBLL clientBLL = new ClientBLL();
-        String[][] data= clientBLL.showClientTable();
-        if(data == null) {
+        String[][] data = clientBLL.showClientTable();
+        if (data == null) {
             ErrorPrompt prompt = new ErrorPrompt("Unable to retrieve data from the table!");
         }
-        String[] columnHeadings = new String[] {"ID", "First Name", "Last Name", "Address", "Email", "Phone Number"};
+        String[] columnHeadings = new String[]{"ID", "First Name", "Last Name", "Address", "Email", "Phone Number"};
         DefaultTableModel tableModel = new DefaultTableModel(data, columnHeadings);
         JTable table = clientWindow.getClientTable();
         table.setModel(tableModel);
+    }
+
+    public void duplicateClientControl() {
+        clientWindow.getDuplicateTableLabel().setVisible(false);
+        ClientBLL clientBLL = new ClientBLL();
+        String[][] data = clientBLL.showClientTable();
+
+        ArrayList<Object> clients = new ArrayList<Object>(data.length);
+        
+        for (String[] currObj : data) {
+            Client toAdd = new Client();
+            toAdd.setID(Integer.parseInt(currObj[0]));
+            toAdd.setFirstName(currObj[1]);
+            toAdd.setLastName(currObj[2]);
+            toAdd.setAddress(currObj[3]);
+            toAdd.setEmail(currObj[4]);
+            toAdd.setAddress(currObj[4]);
+            toAdd.setPhoneNumber(currObj[5]);
+            clients.add(toAdd);
+        }
+
+        String tableName = clientBLL.tableFromList(clients);
+        if(!tableName.equals("-")) {
+            clientWindow.getDuplicateTableLabel().setText("The duplicate table name is: " + tableName);
+            clientWindow.getDuplicateTableLabel().setVisible(true);
+        }
+
     }
 }
 
