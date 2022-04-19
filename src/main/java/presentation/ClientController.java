@@ -97,7 +97,8 @@ public class ClientController implements ActionListener {
             return;
         }
 
-        int status = clientBLL.editClient(toEdit, searchEmail);
+        int status = clientBLL.editClient(toEdit, toEdit.getID());
+
         if (status == -2) {
             ErrorPrompt prompt = new ErrorPrompt("The newly inserted email address is not valid!");
         } else if (status == -1) {

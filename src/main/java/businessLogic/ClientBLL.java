@@ -53,7 +53,7 @@ public class ClientBLL {
      * @param client
      * @return
      */
-    public int editClient(Client client, String searchEmail) {
+    public int editClient(Client client, int ID) {
         //validate changed fields
         for(Validator v : validators) {
             String returnMessage = v.validate(client);
@@ -61,7 +61,7 @@ public class ClientBLL {
                 return -2;
             }
         }
-        return clientDAO.edit(client, searchEmail);
+        return clientDAO.edit(client, ID);
     }
 
     public int deleteClient(String searchEmail) {
