@@ -3,17 +3,15 @@ package presentation;
 import businessLogic.ClientBLL;
 import businessLogic.OrderBLL;
 import businessLogic.ProductBLL;
-import com.google.protobuf.Descriptors;
 import model.Client;
-import model.Order;
+import model.OrderT;
 import model.Product;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.sql.Timestamp;
-import org.apache.pdfbox.*;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -83,7 +81,7 @@ public class OrderController implements ActionListener {
 
             productBLL.editProduct(foundProduct.getID(), foundProduct);
 
-            Order newOrder = new Order(foundClient.getEmail(), foundProduct.getID(), wantedNrOfItems);
+            OrderT newOrder = new OrderT(foundClient.getEmail(), foundProduct.getID(), wantedNrOfItems);
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             newOrder.setProcessingDate(timestamp.toString());
 
@@ -138,7 +136,7 @@ public class OrderController implements ActionListener {
         return results;
     }
 
-    public void generatePDF(Order order, Product product, Client client) {
+    public void generatePDF(OrderT order, Product product, Client client) {
         //TODO: more elegant, more details
         try {
             PDDocument document = new PDDocument();

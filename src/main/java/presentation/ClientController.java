@@ -59,6 +59,7 @@ public class ClientController implements ActionListener {
         }
     }
 
+    //TODO: edit email checkout
     public void editClientControl() {
         clientWindow.getSuccessEditLabel().setVisible(false);
         String searchEmail = clientWindow.getSearchEmailField().getText();

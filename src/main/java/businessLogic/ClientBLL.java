@@ -61,19 +61,19 @@ public class ClientBLL {
                 return -2;
             }
         }
-        return ClientDAO.edit(client, searchEmail);
+        return clientDAO.edit(client, searchEmail);
     }
 
     public int deleteClient(String searchEmail) {
-        return ClientDAO.delete(searchEmail);
+        return clientDAO.delete(searchEmail);
     }
 
     public String[][] showClientTable() {
-        return ClientDAO.show();
+        return clientDAO.show();
     }
 
     public String[] getClientEmails() {
-        return ClientDAO.getEmails();
+        return clientDAO.getEmails();
     }
 
     public String tableFromList(ArrayList<Object> objects) {

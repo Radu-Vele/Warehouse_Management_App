@@ -1,13 +1,13 @@
 package model;
 
-public class Order {
+public class OrderT {
     private String clientEmail;
     private int productID;
     private int ID;
     private int numberOfItems;
     private String processingDate;
 
-    public Order(String clientEmail, int productID, int numberOfItems) {
+    public OrderT(String clientEmail, int productID, int numberOfItems) {
         this.clientEmail = clientEmail;
         this.productID = productID;
         this.numberOfItems = numberOfItems;

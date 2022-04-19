@@ -20,7 +20,7 @@ public class ProductBLL {
         if(product.getItemsInStock() < 0 ) { //number of items added must be non-negative
             return -2;
         }
-        return ProductDAO.edit(ID, product);
+        return productDAO.edit(ID, product);
     }
 
     public Product findProductByID(int ID) {
@@ -28,14 +28,14 @@ public class ProductBLL {
     }
 
     public int deleteProduct(int ID) {
-        return ProductDAO.delete(ID);
+        return productDAO.delete(ID);
     }
 
     public String[][] showProductTable() {
-        return ProductDAO.show();
+        return productDAO.show();
     }
 
     public String[] getProductTitlesAndIDs() {
-        return ProductDAO.getTitlesAndIDs();
+        return productDAO.getTitlesAndIDs();
     }
 }

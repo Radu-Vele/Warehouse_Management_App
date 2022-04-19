@@ -1,21 +1,16 @@
 package dataAccess;
 
-import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.*;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import connection.ConnectionFactory;
-import model.Product;
-
 
 public class GenericDAO<T> {
     protected static final Logger LOGGER = Logger.getLogger(GenericDAO.class.getName());
     private final Class<T> type;
+    private Object field;
 
     @SuppressWarnings("unchecked")
     public GenericDAO() {
@@ -77,18 +72,7 @@ public class GenericDAO<T> {
 
         try{
             insertStatement = dbConnection.prepareStatement(insertQuery(), Statement.RETURN_GENERATED_KEYS);
-
-            Field[] fields = type.getDeclaredFields();
-            int paramIndex = 1;
-            for(Field field : fields) {
-                if(!field.getName().equals("ID")) {
-                    PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), type);
-                    Method getter = propertyDescriptor.getReadMethod();
-                    insertStatement.setObject(paramIndex, getter.invoke(toInsert));
-                    paramIndex++;
-                }
-            }
-
+            int paramIndex = setFields(insertStatement, toInsert);
             insertStatement.executeUpdate();
 
             ResultSet rs = insertStatement.getGeneratedKeys();
@@ -105,7 +89,125 @@ public class GenericDAO<T> {
         return insertedID;
     }
 
+    /**
+     * Edits an entry in the databased found based on a key. The blueprint of the
+     * edited entry is provided by the parameter object.
+     * @param object
+     * @param key
+     * @return
+     */
+    public int edit(Object object, Object key) {
+        int status = 0;
+        Connection dbConnection = ConnectionFactory.getConnection();
+        PreparedStatement editStatement = null;
+
+        try {
+            Field updateKeyField = getField(object, key);
+            editStatement = dbConnection.prepareStatement(editQuery(updateKeyField));
+            int paramIndex = setFields(editStatement, object);
+            editStatement.setObject(paramIndex, key);
+
+            editStatement.execute();
+
+        } catch (Exception e) {
+            return -1;
+        } finally {
+            ConnectionFactory.close(editStatement);
+            ConnectionFactory.close(dbConnection);
+        }
+        return status;
+    }
+
+    /**
+     * Deletes an object from the database based on the key given as parameter
+     * @param key
+     * @return
+     */
+    public int delete(Object key) {
+        int status = 0;;
+        Connection dbConnection = ConnectionFactory.getConnection();
+        PreparedStatement deleteStatement = null;
+        try {
+            Object objectFound = find(key);
+            Field deleteKeyField = getField(objectFound, key);
+            deleteStatement = dbConnection.prepareStatement(deleteQuery(deleteKeyField));
+            deleteStatement.setObject(1, key);
+            deleteStatement.execute();
+
+        } catch (SQLException e) {
+            status = -1;
+        } finally {
+            ConnectionFactory.close(deleteStatement);
+            ConnectionFactory.close(dbConnection);
+        }
+        return status;
+    }
+
+    /**
+     * Retrieves the entire data from a database table and returns it as a String[][]
+     * variable. The data is destined to be shown in a JTable in the presentation layer.
+     * @return
+     */
+    public String[][] showAll() {
+        int nrColumns = this.numberOfEntries();
+        String[][] data = new String[nrColumns][6];
+        Connection dbConnection = ConnectionFactory.getConnection();
+        PreparedStatement showStatement = null;
+        ResultSet rs = null;
+        try {
+            showStatement = dbConnection.prepareStatement(showQuery());
+            rs = showStatement.executeQuery();
+            Field[] fields = type.getDeclaredFields();
+
+            int i = 0;
+            while (rs.next()) {
+
+                for(int j = 0; j < fields.length; j++) {
+                    if (fields[j].getType().toString().equals("int")) {
+                        data[i][j] = Integer.toString((Integer) rs.getObject(fields[j].getName()));
+                    } else {
+                        data[i][j] = (String) rs.getObject(fields[j].getName());
+                    }
+                }
+                i++;
+            }
+        } catch (SQLException e) {
+            data = null;
+        } finally {
+            ConnectionFactory.close(rs);
+            ConnectionFactory.close(showStatement);
+            ConnectionFactory.close(dbConnection);
+        }
+        return data;
+    }
+
+    /**
+     * Returns the number of rows in the database table.
+     * Uses the table specified in the type field of the GenericDAO class.
+     * @return number of rows as an int
+     */
+    public int numberOfEntries() {
+        int toReturn = 0;
+        Connection dbConnection = ConnectionFactory.getConnection();
+        PreparedStatement countStatement = null;
+        ResultSet rs = null;
+        try {
+            countStatement = dbConnection.prepareStatement(numberOfEntriesQuery());
+            rs = countStatement.executeQuery();
+            rs.next();
+            toReturn = rs.getInt("COUNT(*)");
+        } catch (SQLException e) {
+            toReturn = -1;
+        } finally {
+            ConnectionFactory.close(rs);
+            ConnectionFactory.close(countStatement);
+            ConnectionFactory.close(dbConnection);
+        }
+        return toReturn;
+    }
+
     //Private methods ---
+    // Used in the CRUD methods
 
     private T retrieveObject(ResultSet resultSet) {
         T toReturn = null;
@@ -137,27 +239,43 @@ public class GenericDAO<T> {
         return toReturn;
     }
 
-    private int nrOfEntries() {
-        int toReturn = 0;
-        Connection dbConnection = ConnectionFactory.getConnection();
-        PreparedStatement countStatement = null;
-        ResultSet rs = null;
+    private Field getField(Object object, Object key) {
+        Field toReturn = null;
+        Field[] fields = object.getClass().getDeclaredFields();
         try {
-            countStatement = dbConnection.prepareStatement(numberOfEntriesQuery());
-            rs = countStatement.executeQuery();
-            rs.next();
-            toReturn = rs.getInt("COUNT(*)");
-        } catch (SQLException e) {
-            toReturn = -1;
-        } finally {
-            ConnectionFactory.close(rs);
-            ConnectionFactory.close(countStatement);
-            ConnectionFactory.close(dbConnection);
+            for (Field field : fields) {
+                PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), type);
+                Method getter = propertyDescriptor.getReadMethod();
+                Object fieldVal = getter.invoke(object);
+                if (fieldVal.equals(key)) {
+                    toReturn = field;
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            return null;
         }
+
         return toReturn;
     }
 
+    private int setFields(PreparedStatement queryStatement, Object object) throws Exception{
+        Field[] fields = type.getDeclaredFields();
+        int paramIndex = 1;
+        for(Field field : fields) {
+            if(!field.getName().equals("ID")) {
+                PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), type);
+                Method getter = propertyDescriptor.getReadMethod();
+                queryStatement.setObject(paramIndex, getter.invoke(object));
+                paramIndex++;
+            }
+        }
+
+        return paramIndex;
+    }
+
     //Queries ---
+    // Methods that return the right String to create PrepareStatement objects
 
     private String findQuery (String keyColumn) {
         String toReturn = "SELECT * FROM " + type.getSimpleName() + " WHERE " + keyColumn + "=?";
@@ -194,10 +312,31 @@ public class GenericDAO<T> {
         return toReturn;
     }
 
+    private String editQuery(Field updateKey) {
+        String toReturn = "UPDATE " + type.getSimpleName() + " SET ";
+        Field[] fields = type.getDeclaredFields();
+        for (Field field : fields) {
+            if(field.getName().equals("ID")) {
+                continue;
+            }
+            toReturn += field.getName() + " = ?";
+            if(!field.equals(fields[fields.length - 1])) {
+                toReturn += ", ";
+            }
+            else {
+                toReturn += " WHERE " + updateKey.getName() + " = ?";
+            }
+        }
+        return toReturn;
+    }
 
+    private String deleteQuery(Field deleteKeyField) {
+        String toReturn = "DELETE FROM " + type.getSimpleName() + " WHERE ";
+        toReturn += deleteKeyField.getName() + " = ?;";
+        return toReturn;
+    }
 
-    //TODO: edit
-    //TODO: delete
-    //TODO: createAndPopulateFromList
-    //TODO: getContent
+    private String showQuery() {
+        return "SELECT * FROM " + type.getSimpleName() + ";";
+    }
 }

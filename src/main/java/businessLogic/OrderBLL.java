@@ -1,7 +1,7 @@
 package businessLogic;
 
 import dataAccess.OrderDAO;
-import model.Order;
+import model.OrderT;
 
 public class OrderBLL {
     OrderDAO orderDAO;
@@ -9,7 +9,7 @@ public class OrderBLL {
         this.orderDAO = new OrderDAO();
     }
 
-    public int insertOrder(Order order) {
+    public int insertOrder(OrderT order) {
         return orderDAO.insert(order);
     }
 

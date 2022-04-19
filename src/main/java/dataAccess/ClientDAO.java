@@ -13,12 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ClientDAO extends GenericDAO<Client>{
-
-    protected static final Logger LOGGER = Logger.getLogger(ClientDAO.class.getName());
-    private static final String editStatementString = "UPDATE Client SET firstName = ?, lastName = ?, address = ?, email = ?, phoneNumber = ? WHERE email = ? ";
-    private static final String deleteStatementString = "DELETE FROM client where email=?";
-    private static final String showStatementString = "SELECT * FROM client";
-    private static int nrOfTablesCreated = 0;
+    private static int nrOfTablesCreated = 0; //used to create new database tables
 
     public int insert(Client client) {
         return super.insert(client);
@@ -28,101 +23,21 @@ public class ClientDAO extends GenericDAO<Client>{
         return  super.find(searchEmail);
     }
 
-
-    public static int edit(Client client, String searchEmail) {
-        int status = 0;;
-        Connection dbConnection = ConnectionFactory.getConnection();
-        PreparedStatement editStatement = null;
-        try {
-            editStatement = dbConnection.prepareStatement(editStatementString);
-            editStatement.setString(1, client.getFirstName());
-            editStatement.setString(2, client.getLastName());
-            editStatement.setString(3, client.getAddress());
-            editStatement.setString(4, client.getEmail());
-            editStatement.setString(5, client.getPhoneNumber());
-            editStatement.setString(6, searchEmail);
-            editStatement.execute();
-
-        } catch (SQLException e) {
-            status = -1;
-        } finally {
-            ConnectionFactory.close(editStatement);
-            ConnectionFactory.close(dbConnection);
-        }
-        return status;
+    public int edit(Client client, String searchEmail) {
+        return super.edit(client, searchEmail);
     }
 
-    public static int delete(String searchEmail) {
-        int status = 0;;
-        Connection dbConnection = ConnectionFactory.getConnection();
-        PreparedStatement deleteStatement = null;
-        try {
-            deleteStatement = dbConnection.prepareStatement(deleteStatementString);
-            deleteStatement.setString(1, searchEmail);
-            deleteStatement.execute();
-
-        } catch (SQLException e) {
-            status = -1;
-        } finally {
-            ConnectionFactory.close(deleteStatement);
-            ConnectionFactory.close(dbConnection);
-        }
-        return status;
+    public int delete(String searchEmail) {
+        return  super.delete(searchEmail);
     }
 
-    public static String[][] show() {
-        int nrColumns = ClientDAO.numberOfEntries();
-        String[][] data = new String[nrColumns][6];
-        Connection dbConnection = ConnectionFactory.getConnection();
-        PreparedStatement showStatement = null;
-        ResultSet rs = null;
-        try {
-            showStatement = dbConnection.prepareStatement(showStatementString);
-            rs = showStatement.executeQuery();
-
-            int i = 0;
-            while (rs.next()) {
-                data[i][0] = Integer.toString(rs.getInt("ID"));
-                data[i][1] = rs.getString("firstName");
-                data[i][2] = rs.getString("lastName");
-                data[i][3] = rs.getString("address");
-                data[i][4] = rs.getString("email");
-                data[i][5] = rs.getString("phoneNumber");
-                i++;
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING,"Client DAO:show " + e.getMessage());
-            data = null;
-        } finally {
-            ConnectionFactory.close(rs);
-            ConnectionFactory.close(showStatement);
-            ConnectionFactory.close(dbConnection);
-        }
-        return data;
+    public String[][] show() {
+        return super.showAll();
     }
 
-    public static int numberOfEntries() {
-        int toReturn = 0;
-        Connection dbConnection = ConnectionFactory.getConnection();
-        PreparedStatement countStatement = null;
-        ResultSet rs = null;
-        try {
-            countStatement = dbConnection.prepareStatement("SELECT COUNT(*) FROM client");
-            rs = countStatement.executeQuery();
-            rs.next();
-            toReturn = rs.getInt("COUNT(*)");
-        } catch (SQLException e) {
-            toReturn = -1;
-        } finally {
-            ConnectionFactory.close(rs);
-            ConnectionFactory.close(countStatement);
-            ConnectionFactory.close(dbConnection);
-        }
-        return toReturn;
-    }
 
-    public static String[] getEmails() {
-        String[] toReturn = new String[numberOfEntries()];
+    public String[] getEmails() {
+        String[] toReturn = new String[super.numberOfEntries()];
         Connection dbConnection = ConnectionFactory.getConnection();
         PreparedStatement columnStatement = null;
         ResultSet rs = null;
@@ -263,17 +178,5 @@ public class ClientDAO extends GenericDAO<Client>{
             }
         }
         return insertQuery;
-    }
-
-    public static Method getGetterMethod (Object object, Field field) {
-        Method[] methods = object.getClass().getMethods();
-        String fieldName = field.getName();
-        String desiredMethod = "get" + fieldName.substring(0, 1).toUpperCase(Locale.ROOT) + fieldName.substring(1);
-        for(Method method : methods) {
-            if(method.getName().equals(desiredMethod)) {
-                return method;
-            }
-        }
-        return null;
     }
 }
