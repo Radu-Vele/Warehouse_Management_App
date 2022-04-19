@@ -17,6 +17,10 @@ public class Order {
         return clientEmail;
     }
 
+    public void setClientEmail(String clientEmail) {
+        this.clientEmail = clientEmail;
+    }
+
     public int getProductID() {
         return productID;
     }
@@ -39,5 +43,13 @@ public class Order {
 
     public void setProcessingDate(String processingDate) {
         this.processingDate = processingDate;
+    }
+
+    public void setNumberOfItems(int numberOfItems) {
+        this.numberOfItems = numberOfItems;
+    }
+
+    public void setProductID(int productID) {
+        this.productID = productID;
     }
 }

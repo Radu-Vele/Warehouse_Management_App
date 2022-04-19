@@ -13,7 +13,7 @@ public class ProductBLL {
         if(product.getItemsInStock() < 0 ) { //number of items added must be non-negative
             return -2;
         }
-        return ProductDAO.insert(product);
+        return productDAO.insert(product);
     }
 
     public int editProduct(int ID, Product product) {

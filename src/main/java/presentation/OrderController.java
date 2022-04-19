@@ -92,6 +92,10 @@ public class OrderController implements ActionListener {
 
             if(orderID == -1) {
                 ErrorPrompt errorPrompt = new ErrorPrompt("Failed to insert new order to database");
+                return;
+            } else if (orderID == -3) {
+                ErrorPrompt errorPrompt = new ErrorPrompt("Failed to register the order");
+                return;
             }
 
             newOrder.setID(orderID);

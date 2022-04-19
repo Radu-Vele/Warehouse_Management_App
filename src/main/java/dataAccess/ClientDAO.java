@@ -15,38 +15,13 @@ import java.util.logging.Logger;
 public class ClientDAO extends GenericDAO<Client>{
 
     protected static final Logger LOGGER = Logger.getLogger(ClientDAO.class.getName());
-    private static final String insertStatementString = "INSERT INTO client (firstName,lastName,address,email,phoneNumber)"
-            + " VALUES (?,?,?,?,?)";
     private static final String editStatementString = "UPDATE Client SET firstName = ?, lastName = ?, address = ?, email = ?, phoneNumber = ? WHERE email = ? ";
     private static final String deleteStatementString = "DELETE FROM client where email=?";
     private static final String showStatementString = "SELECT * FROM client";
     private static int nrOfTablesCreated = 0;
 
-    public static int insert(Client client) {
-        Connection dbConnection = ConnectionFactory.getConnection();
-        int insertedID = -1; //return value
-        PreparedStatement insertStatement = null;
-        try {
-            insertStatement = dbConnection.prepareStatement(insertStatementString, Statement.RETURN_GENERATED_KEYS);
-            insertStatement.setString(1, client.getFirstName());
-            insertStatement.setString(2, client.getLastName());
-            insertStatement.setString(3, client.getAddress());
-            insertStatement.setString(4, client.getEmail());
-            insertStatement.setString(5, client.getPhoneNumber());
-            insertStatement.executeUpdate();
-
-            ResultSet rs = insertStatement.getGeneratedKeys();
-            if (rs.next()) {
-                insertedID = rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            //LOGGER.log(Level.WARNING, "ClientDAO:insert " + e.getMessage());
-            return -3;
-        } finally {
-            ConnectionFactory.close(insertStatement);
-            ConnectionFactory.close(dbConnection);
-        }
-        return insertedID;
+    public int insert(Client client) {
+        return super.insert(client);
     }
 
     public Client findByEmail(String searchEmail) {

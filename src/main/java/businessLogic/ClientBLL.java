@@ -37,7 +37,7 @@ public class ClientBLL {
             }
         }
 
-        return ClientDAO.insert(client);
+        return clientDAO.insert(client);
     }
 
     /**

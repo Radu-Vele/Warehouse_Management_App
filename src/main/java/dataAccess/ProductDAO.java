@@ -18,7 +18,8 @@ public class ProductDAO extends GenericDAO<Product>{
     private static final String deleteStatementString = "DELETE FROM product WHERE ID=?";
     private static final String showStatementString = "SELECT * FROM product";
 
-    public static int insert(Product product) {
+    public int insert(Product product) {
+        /*
         Connection dbConnection = ConnectionFactory.getConnection();
         int returnID = -1;
         PreparedStatement insertStatement = null;
@@ -41,6 +42,9 @@ public class ProductDAO extends GenericDAO<Product>{
         }
 
         return returnID;
+
+         */
+        return super.insert(product);
     }
 
     public Product findByID(int ID) {

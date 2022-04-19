@@ -34,11 +34,13 @@ public class ClientController implements ActionListener {
 
     public void insertClientControl() {
         clientWindow.getSuccessLabel().setVisible(false);
+
         String firstName = clientWindow.getFirstNameField().getText();
         String lastName = clientWindow.getLastNameField().getText();
         String address = clientWindow.getAddressField().getText();
         String email = clientWindow.getEmailField().getText();
         String phoneNumber = clientWindow.getPhoneNumberField().getText();
+
         if (firstName.equals("") || lastName.equals("") || address.equals("") || email.equals("") || phoneNumber.equals("")) {
             ErrorPrompt prompt = new ErrorPrompt("You must complete all the fields!");
             return;
