@@ -4,13 +4,9 @@ import connection.ConnectionFactory;
 import model.Client;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ClientDAO extends GenericDAO<Client>{
     private static int nrOfTablesCreated = 0; //used to create new database tables
@@ -67,8 +63,6 @@ public class ClientDAO extends GenericDAO<Client>{
         String[] createQueryReturned = createTableQuery(list);
         String createQuery = createQueryReturned[0];
         String returnName = createQueryReturned[1];
-
-        //TODO: if a table with that name exists, delete it
 
         Connection dbConnection = ConnectionFactory.getConnection();
         PreparedStatement createStatement = null;

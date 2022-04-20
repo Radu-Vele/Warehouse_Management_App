@@ -59,7 +59,6 @@ public class ClientController implements ActionListener {
         }
     }
 
-    //TODO: edit email checkout
     public void editClientControl() {
         clientWindow.getSuccessEditLabel().setVisible(false);
         String searchEmail = clientWindow.getSearchEmailField().getText();
@@ -118,7 +117,6 @@ public class ClientController implements ActionListener {
         ClientBLL clientBLL = new ClientBLL();
         int status = clientBLL.deleteClient(emailDelete);
         if (status == -1) {
-            //TODO: should I find client first?
             ErrorPrompt prompt = new ErrorPrompt("There is no client having the inserted email address");
         } else {
             clientWindow.getSuccessDeleteLabel().setVisible(true);
