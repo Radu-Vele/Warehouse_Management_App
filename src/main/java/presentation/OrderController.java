@@ -44,6 +44,7 @@ public class OrderController implements ActionListener {
         performOrderControl();
     }
 
+    //TODO: Create a .order in BLL and move the logic there IMPORTANT
     public void performOrderControl() {
         orderWindow.getSuccessOrderLabel().setVisible(false);
 
@@ -62,31 +63,16 @@ public class OrderController implements ActionListener {
             if(wantedNrOfItems <= 0) {
                 ErrorPrompt errorPrompt = new ErrorPrompt("The ordered number of items must be greater than 0!");
             }
-            ProductBLL productBLL = new ProductBLL();
-            ClientBLL clientBLL = new ClientBLL();
 
-            Client foundClient = null;
-            Product foundProduct = null;
-            ArrayList<Object> retrievedObjects = retrieveObjects(clientBLL, productBLL, wantedEmail, wantedID, wantedNrOfItems);
-            if( retrievedObjects== null) {
+            OrderBLL orderBLL = new OrderBLL();
+            ArrayList<Object> results = orderBLL.performOrder(wantedEmail, wantedID, wantedNrOfItems);
+            if(results.size() == 2) {
+                ErrorPrompt errorPrompt = new ErrorPrompt((String) results.get(0));
                 return;
             }
 
-            foundClient = (Client) retrievedObjects.get(0);
-            foundProduct = (Product) retrievedObjects.get(1);
-
-            //decrement stock
-            int newStock = foundProduct.getItemsInStock() - wantedNrOfItems;
-            foundProduct.setItemsInStock(newStock);
-
-            productBLL.editProduct(foundProduct.getID(), foundProduct);
-
-            OrderT newOrder = new OrderT(foundClient.getEmail(), foundProduct.getID(), wantedNrOfItems);
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            newOrder.setProcessingDate(timestamp.toString());
-
-            OrderBLL orderBLL = new OrderBLL();
-            int orderID = orderBLL.insertOrder(newOrder);
+            int orderID = orderBLL.insertOrder((OrderT) results.get(0));
+            OrderT newOrder = (OrderT) results.get(0);
 
             if(orderID == -1) {
                 ErrorPrompt errorPrompt = new ErrorPrompt("Failed to insert new order to database");
@@ -97,6 +83,8 @@ public class OrderController implements ActionListener {
             }
 
             newOrder.setID(orderID);
+            Client foundClient = (Client) results.get(1);
+            Product foundProduct = (Product) results.get(2);
 
             if(orderWindow.getIWantABillCheckBox().isSelected()) {
                 generatePDF(newOrder, foundProduct, foundClient);
